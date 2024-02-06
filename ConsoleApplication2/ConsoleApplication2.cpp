@@ -1,82 +1,102 @@
-#include <iostream>
+#include <iostream>  
 using namespace std;
 
-int checkMoney(int money) {
-    while (money < 5000 || money % 1000 != 0) {
-        cout << "Сумма денег должна быть круглой и не меньше 5000" << endl << "Введи сумму денег: ";
-        cin >> money;
+float checkMoney(float money) {
+    while (money <= 4000 || fmod(money, 100) != 0) {
+        cout << "Сумма денег должна быть круглой и не меньше 5000" << endl;
+        return 0;
     }
     return money;
 }
 
-void selection(int& balance, int choice) {
-    int withdrawMoney, deposit, operatorTel, moneyСards;
-    while (true) {
-        switch (choice) {
-        case 1:
-            cout << "Ваш баланс: " << balance << " рублей" << endl;
-            break;
-        case 2:
+void selection(float& balance, int choice) {
+    float withdrawMoney, deposit, operatorTel, moneyCards, commission;
+    switch (choice) {
+    case 1:
+        cout << "Введите сумму, которую хотите снять: ";
+        cin >> withdrawMoney;
+        while (withdrawMoney > balance) {
+            cout << "Вы не можете снять сумму денег больше вашего баланса" << endl;
             cout << "Введите сумму, которую хотите снять: ";
             cin >> withdrawMoney;
-            withdrawMoney = checkMoney(withdrawMoney);
-            balance -= withdrawMoney;
-            break;
-        case 3:
-            cout << "Введите сумму, которую хотите положить: ";
-            cin >> deposit;
-            deposit = checkMoney(deposit);
-            balance += deposit;
-            break;
-        case 4:
-            cout << "1 - если билайн" << endl << "2 - если мтс" << endl;
-            while (true) {
-                cin >> operatorTel;
-                if (operatorTel == 1) {
-                    cout << "Комиссия 5%" << endl << "Введите сумму, на которую хотите пополнить баланс: ";
-                    cin >> moneyСards;
-                    cout << "Зачислено " << moneyСards * 0.95 << " рублей";
-                    break;
-                }
-                else if (operatorTel == 2) {
-                    cout << "Комиссия 7%" << endl << "Введите сумму, на которую хотите пополнить баланс: ";
-                    cin >> moneyСards;
-                    cout << "Зачислено " << moneyСards * 0.93 << " рублей";
-                    break;
-                }
-                else {
-                    cout << "Такого оператора нет. Введите 1 - если билайн и 2 - если мтс: ";
-                }
-            }
-            break;
-        case 5:
-            return;
-        default:
-            cout << "Такого действия нет.";
         }
+        withdrawMoney = checkMoney(withdrawMoney);
+        balance -= withdrawMoney;
+        cout << "Снято: " << withdrawMoney << " рублей" << endl;
+        break;
+    case 2:
+        cout << "Введите сумму, которую хотите положить: ";
+        cin >> deposit;
+        deposit = checkMoney(deposit);
+        balance += deposit;
+        cout << "Внесено: " << deposit << " рублей" << endl;
+        break;
+    case 3:
+        int numb;
+        cout << "Выберите оператора:\n1 - билайн\n2 - мтс\n";
+        cin >> operatorTel;
+        cout << "Введи номер сим карты: ";
+        cin >> numb;
+        cout << "Введите сумму, на которую хотите пополнить баланс: ";
+        cin >> moneyCards;
+        if (operatorTel == 1) {
+            commission = moneyCards * 0.05;
+        }
+        else if (operatorTel == 2) {
+            commission = moneyCards * 0.07;
+        }
+        else {
+            cout << "Такого оператора нет." << endl;
+            break;
+        }
+        if (balance < commission + moneyCards) {
+            cout << "Недостаточно средств для пополнения." << endl;
+            break;
+        }
+        balance -= (commission + moneyCards);
+        cout << "Зачислено " << moneyCards << " рублей." << endl;
+        break;
+    case 4:
+        cout << "Ваш баланс: " << balance << " рублей" << endl;
+        break;
+    case 5:
+        break;
+    default:
+        cout << "Такого действия нет." << endl;
     }
 }
 
-void functional(int cardInput, int pinInput) {
-    int balance1 = 30000;
+void functional(int cardInput) {
+    float balance;
+    if (cardInput == 123456) {
+        balance = 30000;
+    }
+    else if (cardInput == 654321) {
+        balance = 45000;
+    }
+    else {
+        cout << "Такой карты нет. Попробуйте снова." << endl;
+        return;
+    }
     int choice;
     while (true) {
-        cout << "Выбери действие: " << endl;
-        cout << "1 - Показать баланс" << endl;
-        cout << "2 - Снять деньги" << endl;
-        cout << "3 - Положить деньги" << endl;
-        cout << "4 - Пополнить баланс на карту" << endl;
+        cout << endl;
+        cout << "1 - Снять деньги" << endl;
+        cout << "2 - Положить деньги" << endl;
+        cout << "3 - Пополнить баланс на карту" << endl;
+        cout << "4 - Показать баланс" << endl;
         cout << "5 - Выход" << endl;
+        cout << "Выберите действие: ";
         cin >> choice;
-
-        if (cardInput == 123456) {
-            selection(balance1, choice);
+        if (choice == 5) {
+            break;
         }
+        selection(balance, choice);
     }
 }
 
-void check(int cardInput, int pinInput) {
-    int pin;
+void check(int cardInput) {
+    int pin, pinInput, attempts = 3, n = 0;
     if (cardInput == 123456) {
         pin = 123;
     }
@@ -84,37 +104,37 @@ void check(int cardInput, int pinInput) {
         pin = 321;
     }
     else {
-        cout << "Такой карты нет. Попробуйте снова.";
+        cout << "Такой карты нет. Попробуйте снова." << endl;
         return;
     }
-
-    cout << "Введи пин-код: ";
-    for (int i = 0; i < 3; i++) {
+    cout << "Введите пин-код: ";
+    for (int i = 0; i < attempts; i++) {
         cin >> pinInput;
         if (pinInput == pin) {
             cout << "Добро пожаловать!" << endl;
-            functional(cardInput, pinInput);
-            return;
-        }
-        else if (i == 2) {
-            cout << "Карта заблокирована" << endl;
+            functional(cardInput);
             return;
         }
         else {
-            cout << "Пароль не подошел. Введи пин-код заново: ";
+            n++;
+            if (n == attempts) {
+                cout << "Карта заблокирована." << endl;
+                return;
+            }
+            else {
+                cout << "Пароль не подошел. Введите пин-код заново: ";
+            }
         }
     }
 }
 
 int main() {
     setlocale(0, "");
-
     int cardInput;
     while (true) {
-        cout << "Введи номер карты: ";
+        cout << endl << "Введите номер карты: ";
         cin >> cardInput;
-        check(cardInput, 0);
+        check(cardInput);
     }
-
     return 0;
 }
